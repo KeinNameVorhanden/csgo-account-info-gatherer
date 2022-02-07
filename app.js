@@ -1,4 +1,5 @@
 const SteamUser = require('steam-user');
+const SteamTotp = require("steam-totp");
 const GlobalOffensive = require('globaloffensive');
 const config = require("./config.json");
 
@@ -40,7 +41,7 @@ steam.on("appLaunched", async () => {
     steam.logOn({
         accountName: config.username,
         password: config.password,
-        twoFactorCode?: config.secret,
+        twoFactorCode?: config.secret.length > 5 ? SteamTotp.getAuthCode(secret) : undefined,
 		rememberPassword: true
     });
 })();
