@@ -1,5 +1,6 @@
 const SteamUser = require('steam-user');
 const GlobalOffensive = require('globaloffensive');
+const config = require("./config.json");
 
 let steam = new SteamUser();
 let csgo = new GlobalOffensive(steam);
@@ -37,9 +38,9 @@ steam.on("appLaunched", async () => {
             autoRelogin?: boolean;
     ///////////////////////////////////*/
     steam.logOn({
-        accountName: "string",
-        password: "string",
-        twoFactorCode?: "string",
+        accountName: config.username,
+        password: config.password,
+        twoFactorCode?: config.secret,
 		rememberPassword: true
     });
 })();
