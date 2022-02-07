@@ -6,20 +6,52 @@ const config = require("./config.json");
 let steam = new SteamUser();
 let csgo = new GlobalOffensive(steam);
 
+steam.on("error", async (err) => {
+	// error occurred
+});
+
 steam.on("loggedOn", () => {
     // user logged on
 });
 
-steam.on("loginKey", () => {
+steam.on("disconnected", async (eresult, msg) => {
+	// steam disconnected
+});
+
+steam.on("loginKey", (key) => {
     // user login key created
 });
 
-steam.on("user", () => {
+steam.on("user", (sid, user) => {
     // user is logged in
 });
 
-steam.on("appLaunched", async () => {
+steam.on("appLaunched", async (appID) => {
 	// user launched app
+});
+
+steam.on("appQuit", async (appID) => {
+	// user quit app
+});
+
+steam.on("accountInfo", async (...data) => {
+	// account info was sent
+});
+
+steam.on("emailInfo", async (...data) => {
+	// email info was sent
+});
+
+steam.on("accountLimitations", async (...data) => {
+	// account limitation info was sent
+});
+
+steam.on("wallet", async (...data) => {
+	// wallet info was sent
+});
+
+steam.on("licenses", async (...data) => {
+	// license info was sent
 });
 
 (async () => {
