@@ -1,3 +1,5 @@
+const fs = require("fs");
+const path = require("path");
 const SteamUser = require('steam-user');
 const SteamTotp = require("steam-totp");
 const GlobalOffensive = require('globaloffensive');
@@ -28,12 +30,12 @@ steam.on("disconnected", async (eresult, msg) => {
 
 steam.on("loginKey", (key) => {
     // user login key created
-	let dataPath = path.join(__dirname, "data");
-	if (!fs.existsSync(dataPath)) {
-		fs.mkdirSync(dataPath);
+	let data_path = path.join(__dirname, "data");
+	if (!fs.existsSync(data_path)) {
+		fs.mkdirSync(data_path);
 	}
 
-    fs.writeFileSync(path.join(dataPath, config.username + ".loginkey"), JSON.stringify({
+    fs.writeFileSync(path.join(data_path, config.username + ".loginkey"), JSON.stringify({
 		loginkey: key,
 		account: config.username
 	}, null, "\t"));
@@ -41,6 +43,13 @@ steam.on("loginKey", (key) => {
 
 steam.on("user", (sid, user) => {
     // user is logged in
+	if (sid.accountid !== steam.steamID.accountid)
+        return
+
+    if (user.gameid !== "0") 
+		return
+
+	steam.gamesPlayed([730]);
 });
 
 steam.on("appLaunched", async (appID) => {
@@ -84,6 +93,22 @@ csgo.on("disconnectedFromGC", () => {
 
 (() => {
 	// login to an given steam account
+
+    // Get login key if we have one
+	let data_path = path.join(__dirname, "data");
+	if (!fs.existsSync(data_path)) {
+		fs.mkdirSync(data_path);
+	}
+
+	let loginkey_path = path.join(data_path, config.username + ".loginkey");
+	let key_data = fs.existsSync(loginkey_path) ? fs.readFileSync(loginkey_path).toString() : undefined;
+	try {
+		key_data = key_data ? JSON.parse(key_data) : undefined;
+	} catch {
+		console.log("Failed to parse login key from previous session.");
+	}
+	let useLoginKey = key_data && key_data.account === config.username;
+
     steam.logOn({
         accountName: config.username,
         password: config.password,
