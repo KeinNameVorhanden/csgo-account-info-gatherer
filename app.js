@@ -9,6 +9,7 @@ let csgo = new GlobalOffensive(steam);
 let logged_in, connected
 
 steam.on("error", async (err) => {
+    throw new Error(err)
 	// error occurred
     logged_in = false
 });
@@ -19,6 +20,7 @@ steam.on("loggedOn", () => {
 });
 
 steam.on("disconnected", async (eresult, msg) => {
+    console.log("Disconnected with the result", SteamUser.EResult[eresult], (msg ? ("\n", msg) : ""))
 	// steam disconnected
     logged_in = false
 });
