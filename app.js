@@ -72,22 +72,8 @@ csgo.on("disconnectedFromGC", () => {
 	connected = false
 });
 
-(async () => {
+(() => {
 	// Login to an given steam account
-
-    /*///////////////////////////////////
-        interface LogOnDetailsNamePass
-            accountName: string;
-            password: string;
-            authCode?: string;
-            twoFactorCode?: string;
-            rememberPassword?: boolean;
-            logonID?: number | string;
-            machineName?: string;
-            clientOS?: SteamUser.EOSType;
-            dontRememberMachine?: boolean;
-            autoRelogin?: boolean;
-    ///////////////////////////////////*/
     steam.logOn({
         accountName: config.username,
         password: config.password,
