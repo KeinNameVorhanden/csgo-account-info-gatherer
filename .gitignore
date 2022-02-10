@@ -2,3 +2,4 @@
 node_modules/*
 data/*
 start.bat
+config.json
