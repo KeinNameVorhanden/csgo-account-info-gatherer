@@ -17,6 +17,7 @@ steam.on("error", async (err) => {
 steam.on("loggedOn", () => {
     // user logged on
     logged_in = true
+	steam.setPersona(SteamUser.EPersonaState.Invisible);
 });
 
 steam.on("disconnected", async (eresult, msg) => {
@@ -27,6 +28,15 @@ steam.on("disconnected", async (eresult, msg) => {
 
 steam.on("loginKey", (key) => {
     // user login key created
+	let dataPath = path.join(__dirname, "data");
+	if (!fs.existsSync(dataPath)) {
+		fs.mkdirSync(dataPath);
+	}
+
+    fs.writeFileSync(path.join(dataPath, config.username + ".loginkey"), JSON.stringify({
+		loginkey: key,
+		account: config.username
+	}, null, "\t"));
 });
 
 steam.on("user", (sid, user) => {
@@ -73,7 +83,7 @@ csgo.on("disconnectedFromGC", () => {
 });
 
 (() => {
-	// Login to an given steam account
+	// login to an given steam account
     steam.logOn({
         accountName: config.username,
         password: config.password,
