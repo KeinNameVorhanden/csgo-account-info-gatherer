@@ -8,6 +8,11 @@ const config = require("./config.json");
 let steam = new SteamUser();
 let csgo = new GlobalOffensive(steam);
 
+let data_path = path.join(__dirname, "data");
+if (!fs.existsSync(data_path)) {
+    fs.mkdirSync(data_path);
+}
+
 let logged_in, connected
 
 steam.on("error", async (err) => {
@@ -30,13 +35,8 @@ steam.on("disconnected", async (eresult, msg) => {
 
 steam.on("loginKey", (key) => {
     // user login key created
-	let data_path = path.join(__dirname, "data");
-	if (!fs.existsSync(data_path)) {
-		fs.mkdirSync(data_path);
-	}
-
     fs.writeFileSync(path.join(data_path, config.username + ".loginkey"), JSON.stringify({
-		loginkey: key,
+		login_key: key,
 		account: config.username
 	}, null, "\t"));
 });
@@ -92,14 +92,7 @@ csgo.on("disconnectedFromGC", () => {
 });
 
 (() => {
-	// login to an given steam account
-
     // Get login key if we have one
-	let data_path = path.join(__dirname, "data");
-	if (!fs.existsSync(data_path)) {
-		fs.mkdirSync(data_path);
-	}
-
 	let loginkey_path = path.join(data_path, config.username + ".loginkey");
 	let key_data = fs.existsSync(loginkey_path) ? fs.readFileSync(loginkey_path).toString() : undefined;
 	try {
@@ -107,12 +100,14 @@ csgo.on("disconnectedFromGC", () => {
 	} catch {
 		console.log("Failed to parse login key from previous session.");
 	}
-	let useLoginKey = key_data && key_data.account === config.username;
+	let use_login_key = key_data && key_data.account === config.username;
 
+	// login to an given steam account
     steam.logOn({
-        accountName: config.username,
-        password: config.password,
-        twoFactorCode?: config.secret.length > 5 ? SteamTotp.getAuthCode(secret) : undefined,
+		accountName: config.username,
+		password: use_login_key ? undefined : config.password,
+		twoFactorCode: use_login_key ? undefined : (config.secret && config.secret.length > 5 ? SteamTotp.getAuthCode(config.secret) : undefined),
+		loginKey: use_login_key ? key_data.login_key : undefined,
 		rememberPassword: true
-    });
+	});
 })();
